@@ -1,0 +1,88 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5 mb-5">
+    <h2 class="mb-5 text-center"><b>Reserve Your Stay</b></h2>
+
+    <!-- Listing & Image -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <img src="<%= listing.image.url %>" alt="<%= listing.title %>" class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-6 mt-3">
+            <h3><b><%= listing.title %></b></h3>
+            <br>
+            <p><strong>Description :- </strong><%= listing.description %></p>
+            <p><strong>Location :-</strong> <%= listing.location %></p>
+            <p><strong>Country :- </strong><%= listing.country %></p>
+            <p><strong>Price :</strong> ₹<span id="pricePerNight"><%= listing.price %> / night</span></p>
+        </div>
+    </div>
+    <hr>
+
+    <!-- User Info -->
+    <div class="mb-4">
+        <h4><b>User Information</b></h4>
+        <br>
+        <p><strong>Username:</strong> <%= listing.owner.username %> </p>
+        <p><strong>Email:</strong> <%= listing.owner.email %></p>
+    </div>
+    <hr>
+
+    <!-- Date Selection -->
+    <div class="mb-4">
+        <h4><b>Select Reservation Dates</b></h4>
+    </br>
+        <form id="reservationForm">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="checkin" class="form-label">Check-in</label>
+                    <input type="date" id="checkin" name="checkin" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="checkout" class="form-label">Check-out</label>
+                    <input type="date" id="checkout" name="checkout" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <p><strong>Total Nights:</strong> <span id="nights">0</span></p>
+                <p><strong>Total Price:</strong> ₹<span id="totalPrice">0</span></p>
+            </div>
+
+            <button type="submit" class="btn btn-success mt-3">Proceed to Payment</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const checkin = document.getElementById("checkin");
+    const checkout = document.getElementById("checkout");
+    const nightsSpan = document.getElementById("nights");
+    const totalPriceSpan = document.getElementById("totalPrice");
+    const pricePerNight = parseFloat(document.getElementById("pricePerNight").innerText);
+
+    function calculateNightsAndPrice() {
+        const checkinDate = new Date(checkin.value);
+        const checkoutDate = new Date(checkout.value);
+
+        if (!isNaN(checkinDate) && !isNaN(checkoutDate) && checkoutDate > checkinDate) {
+            const diffTime = checkoutDate - checkinDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            nightsSpan.innerText = diffDays;
+            totalPriceSpan.innerText = diffDays * pricePerNight;
+        } else {
+            nightsSpan.innerText = 0;
+            totalPriceSpan.innerText = 0;
+        }
+    }
+
+    checkin.addEventListener("change", calculateNightsAndPrice);
+    checkout.addEventListener("change", calculateNightsAndPrice);
+
+    document.getElementById("reservationForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        alert("Redirecting to payment gateway...");
+        // Optional: redirect to Razorpay or payment route
+    });
+</script>
